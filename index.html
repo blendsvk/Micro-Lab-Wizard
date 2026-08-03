@@ -7701,7 +7701,33 @@
             if (isNaN(minutes) || minutes <= 0) {
                 showToast("Please enter a valid time in minutes.", "error");
                 return;
-            }
+            }       // ─── Schedule Telegram alert ──────────────────────────────────────────
+    const enabled = localStorage.getItem('telegramEnabled') !== 'false';
+    const token = localStorage.getItem('telegramToken');
+    const chatId = localStorage.getItem('telegramChatId');
+    const webAppUrl = localStorage.getItem('telegramWebAppUrl');
+
+    console.log('🔔 Start fetch: enabled=' + enabled + ', token=' + token + ', chatId=' + chatId);
+
+    if (enabled && token && chatId && webAppUrl && minutes > 0) {
+        console.log('📨 Sending start fetch with minutes:', minutes);
+        fetch(webAppUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({
+                minutes: minutes,
+                token: token,
+                chatId: chatId
+            })
+        }).then(() => {
+            console.log('✅ Start fetch sent successfully.');
+        }).catch(err => {
+            console.warn('❌ Failed to schedule Telegram alert:', err);
+        });
+    } else {
+        console.log('⚠️ Telegram disabled or missing credentials');
+    }
 
             stopAlarmSound();
             document.getElementById("alarmModal").classList.add("hidden");
