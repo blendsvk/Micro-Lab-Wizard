@@ -2839,19 +2839,38 @@
                     </p>
                 </div>
                 <div class="flex items-center space-x-1.5 sm:space-x-2 flex-wrap gap-1">
-                    <button id="cfuStartCamBtn" onclick="startCFUCamera()"
-                        class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-[10px] sm:text-xs font-bold flex items-center space-x-1 transition shadow-lg shadow-amber-500/20 btn-transition">
-                        <i data-lucide="camera" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
-                        <span>Camera</span>
-                    </button>
-                    <label
-                        class="cfu-file-label cursor-pointer px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-xl text-[10px] sm:text-xs font-semibold flex items-center space-x-1 transition btn-transition">
-                        <i data-lucide="upload" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
-                        <span>Upload</span>
-                        <input type="file" id="cfuFileInput" accept="image/*" class="hidden"
-                            onchange="handleCFUFileUpload(event)" />
-                    </label>
-                </div>
+    <button id="cfuStartCamBtn" onclick="startCFUCamera()"
+        class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-[10px] sm:text-xs font-bold flex items-center space-x-1 transition shadow-lg shadow-amber-500/20 btn-transition">
+        <i data-lucide="camera" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+        <span>Camera</span>
+    </button>
+    <label
+        class="cfu-file-label cursor-pointer px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-xl text-[10px] sm:text-xs font-semibold flex items-center space-x-1 transition btn-transition">
+        <i data-lucide="upload" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+        <span>Upload</span>
+        <input type="file" id="cfuFileInput" accept="image/*" class="hidden" onchange="handleCFUFileUpload(event)" />
+    </label>
+
+    <!-- ===== NEW: Export Dataset Button ===== -->
+    <button onclick="exportTrainingDataset()" 
+        class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-[10px] sm:text-xs font-bold flex items-center gap-1.5 transition shadow-lg shadow-emerald-500/20 btn-transition">
+        <i data-lucide="download" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+        <span>Export Dataset</span>
+    </button>
+
+     <button onclick="clearCFUSnapshots()" 
+         class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-rose-700 hover:bg-rose-600 text-white rounded-xl text-[10px] sm:text-xs font-bold flex items-center gap-1.5 transition shadow-lg shadow-rose-500/20 btn-transition">
+         <i data-lucide="trash-2" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+         <span>Clear Snapshots</span>
+     </button>
+
+    <!-- ===== NEW: Upload AI Model Button ===== -->
+    <label class="cursor-pointer px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] sm:text-xs font-bold flex items-center gap-1.5 transition shadow-lg shadow-indigo-500/20 btn-transition">
+        <i data-lucide="upload" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+        <span>Upload AI Model</span>
+        <input type="file" id="cfuModelUpload" webkitdirectory accept=".json,.bin" class="hidden" onchange="handleModelUpload(event)" />
+    </label>
+</div>
             </div>
         </div>
 
@@ -4057,7 +4076,7 @@
                         <div id="storageProgressBar"
                             class="bg-teal-500 h-full w-[2%] transition-all duration-700 ease-out"></div>
                     </div>
-                    <div class="grid grid-cols-5 gap-1 sm:gap-2 pt-1 text-[9px] sm:text-[10px] text-slate-400">
+                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-1 sm:gap-2 pt-1 text-[9px] sm:text-[10px] text-slate-400">
                         <div class="bg-slate-900 p-1.5 rounded-lg border border-slate-800 card-hover text-center">
                             <span class="block text-slate-500">Media</span>
                             <span id="modalMediaCount" class="text-slate-200 font-mono font-bold">0</span>
@@ -4077,6 +4096,10 @@
                         <div class="bg-slate-900 p-1.5 rounded-lg border border-slate-800 card-hover text-center">
                             <span class="block text-slate-500">Indicators</span>
                             <span id="modalIndicatorCount" class="text-cyan-300 font-mono font-bold">0</span>
+                        </div>
+                        <div class="bg-slate-900 p-1.5 rounded-lg border border-slate-800 card-hover text-center">
+                            <span class="block text-slate-500">CFU Snapshots</span>
+                            <span id="modalCFUSnapshotCount" class="text-rose-300 font-mono font-bold">0</span>
                         </div>
                     </div>
                 </div>
@@ -5798,11 +5821,10 @@
             origToggleBatchDrawer();
             triggerHapticFeedback('LIGHT');
         };
-
         // ─── The rest of the application logic ──────────────────────────────────
         // ─── IndexedDB Constants ──────────────────────────────────────────────
         const DB_NAME = 'MicroLabWizardDB';
-        const DB_VERSION = 4;
+        const DB_VERSION = 6;
         const STORE_MEDIA = 'mediaCatalog';
         const STORE_MICROBES = 'microbeCatalog';
         const STORE_AI_CONVOS = 'aiConversations';
@@ -5862,6 +5884,235 @@
         let cfuMaskOffsetY = 0;
         let cfuTransformMatrix = null;
         let cfuTouchActive = false;
+        let mlModel = null;
+        let mlModelLoaded = false;
+        let useMLDetection = false;
+
+// ─── CFU Self-Learning (Correction History) ──────────
+let correctionHistory = [];
+const STORE_CORRECTIONS = 'cfuCorrections';
+// Function to save current state (image + detections)
+async function saveCorrectionSnapshot() {
+    if (!cfuImageObj) return;
+
+    const canvas = document.getElementById('cfuCanvas');
+    const imageData = canvas.toDataURL('image/jpeg', 0.9);
+
+    const detections = cfuDetectedColonies.map(c => ({
+        x: c.x,
+        y: c.y,
+        r: c.r,
+        manual: c.manual || false
+    }));
+
+    const record = {
+        id: `corr_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+        timestamp: new Date().toISOString(),
+        imageData: imageData,
+        detections: detections,
+        imageWidth: canvas.width,
+        imageHeight: canvas.height
+    };
+
+    try {
+        await putToStore(STORE_CORRECTIONS, record);
+        correctionHistory.push(record);
+        if (correctionHistory.length > 500) correctionHistory.shift();
+        console.log(`✅ Correction saved (total: ${correctionHistory.length})`);
+    } catch (err) {
+        console.warn('Failed to save correction:', err);
+    }
+}
+
+// Load existing corrections from DB on startup
+async function loadCorrectionHistory() {
+    try {
+        const records = await getAllFromStore(STORE_CORRECTIONS);
+        correctionHistory = records || [];
+        console.log(`📚 Loaded ${correctionHistory.length} past corrections.`);
+    } catch (err) {
+        correctionHistory = [];
+    }
+}
+// ─── JSZip Dynamic Load (for export) ──────────────────
+function loadJSZip() {
+    return new Promise((resolve, reject) => {
+        if (typeof JSZip !== 'undefined') return resolve(JSZip);
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+        script.onload = () => resolve(window.JSZip);
+        script.onerror = () => reject(new Error('Failed to load JSZip'));
+        document.head.appendChild(script);
+    });
+}
+
+// ─── Export Training Dataset ──────────────────────────
+async function exportTrainingDataset() {
+    try {
+        const allRecords = await getAllFromStore(STORE_CORRECTIONS);
+        if (allRecords.length < 20) {
+            showToast('⚠️ Need at least 20 corrected images. Keep using the CFU counter!', 'error');
+            return;
+        }
+
+        showToast(`📦 Preparing ${allRecords.length} images for export...`, 'info');
+
+        const JSZip = await loadJSZip();
+        const zip = new JSZip();
+
+        const imagesFolder = zip.folder('images');
+        const labelsFolder = zip.folder('labels');
+
+        const yamlContent = `
+path: .
+train: images
+val: images
+
+names:
+  0: colony
+        `;
+        zip.file('data.yaml', yamlContent.trim());
+
+        let processed = 0;
+        for (const record of allRecords) {
+            const imgData = record.imageData.split(',')[1];
+            const imgExt = record.imageData.includes('png') ? 'png' : 'jpg';
+            const imgName = `img_${String(processed + 1).padStart(5, '0')}.${imgExt}`;
+            imagesFolder.file(imgName, imgData, { base64: true });
+
+            const W = record.imageWidth || 640;
+            const H = record.imageHeight || 480;
+            let labelLines = [];
+            for (const det of record.detections) {
+                const r = Math.max(det.r, 4);
+                let x_norm = Math.min(1, Math.max(0, det.x / W));
+                let y_norm = Math.min(1, Math.max(0, det.y / H));
+                let w_norm = Math.min(1, Math.max(0.01, (r * 2) / W));
+                let h_norm = Math.min(1, Math.max(0.01, (r * 2) / H));
+                labelLines.push(`0 ${x_norm.toFixed(6)} ${y_norm.toFixed(6)} ${w_norm.toFixed(6)} ${h_norm.toFixed(6)}`);
+            }
+            if (labelLines.length > 0) {
+                const labelName = `img_${String(processed + 1).padStart(5, '0')}.txt`;
+                labelsFolder.file(labelName, labelLines.join('\n'));
+            }
+            processed++;
+        }
+
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        const url = URL.createObjectURL(zipBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `cfu_training_dataset_${new Date().toISOString().slice(0,10)}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+
+        showToast(`✅ Exported ${processed} images! Ready for Colab training.`, 'success');
+
+    } catch (err) {
+        console.error(err);
+        showToast('❌ Export failed: ' + err.message, 'error');
+    }
+}
+
+// ─── Clear CFU Correction Snapshots ───────────────────
+function clearCFUSnapshots() {
+    showConfirmModal(
+        'Clear CFU Snapshots',
+        'Permanently delete all saved CFU correction snapshots? This will not affect your media catalog, AI model, or other data.',
+        async () => {
+            try {
+                await clearStore(STORE_CORRECTIONS);
+                correctionHistory = [];
+                await updateStorageStats();
+                showToast('✅ All CFU snapshots were cleared.', 'success');
+            } catch (err) {
+                console.error('Failed to clear CFU snapshots:', err);
+                showToast('❌ Failed to clear CFU snapshots: ' + err.message, 'error');
+            }
+        }
+    );
+}
+
+// ─── Upload New AI Model (from local folder) ──────────
+async function handleModelUpload(event) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    let jsonFile = null;
+    let binFile = null;
+    for (const file of files) {
+        if (file.name.endsWith('.json')) jsonFile = file;
+        if (file.name.endsWith('.bin')) binFile = file;
+    }
+    if (!jsonFile) {
+        showToast('❌ model.json not found in the selected folder.', 'error');
+        return;
+    }
+
+    showToast('📤 Uploading model...', 'info');
+
+    try {
+        const jsonText = await jsonFile.text();
+        const modelConfig = JSON.parse(jsonText);
+        const modelData = {
+            id: 'cfu_ml_model',
+            json: jsonText,
+            weights: binFile ? await readFileAsBase64(binFile) : null,
+            weightName: binFile ? binFile.name : null,
+            updatedAt: new Date().toISOString()
+        };
+        await putToStore('cfu_ml_model', modelData);
+
+        // Optional: if TF.js is loaded, load the model immediately
+        if (typeof tf !== 'undefined' && tf) {
+            const model = await tf.loadGraphModel(tf.io.fromMemory(
+                modelConfig,
+                binFile ? [await readFileAsArrayBuffer(binFile)] : []
+            ));
+            mlModel = model;
+            mlModelLoaded = true;
+            useMLDetection = true;
+            const toggleBtn = document.getElementById('mlToggleBtn');
+            if (toggleBtn) toggleBtn.textContent = '🤖 AI: ON';
+            showToast('✅ New AI Model loaded successfully!', 'success');
+        } else {
+            showToast('📦 Model saved. Click "AI: ON" to load it.', 'info');
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('❌ Failed to upload model: ' + err.message, 'error');
+    }
+}
+
+// Helpers for file reading
+function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+function readFileAsArrayBuffer(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(file);
+    });
+}
+
+// ─── Load model from IndexedDB on app startup ──────────
+async function loadStoredModel() {
+    try {
+        const stored = await getOneFromStore('cfu_ml_model', 'cfu_ml_model');
+        if (!stored) return;
+        console.log('📦 Stored model found. Click "AI: ON" to load it.');
+    } catch (e) { /* ignore */ }
+}
 
         // ─── AI State ──────────────────────────────────────────────────────
         let aiConversationHistory = [];
@@ -6226,6 +6477,12 @@
                     }
                     if (!db.objectStoreNames.contains(STORE_INDICATORS)) {
                         db.createObjectStore(STORE_INDICATORS, {keyPath: 'id'});
+                    }
+                    if (!db.objectStoreNames.contains(STORE_CORRECTIONS)) {
+                        db.createObjectStore(STORE_CORRECTIONS, {keyPath: 'id'});
+                    }
+                    if (!db.objectStoreNames.contains('cfu_ml_model')) {
+                        db.createObjectStore('cfu_ml_model', {keyPath: 'id'});
                     }
                 };
             });
@@ -8463,6 +8720,13 @@
             let stainCount = stainSearchIndex.length;
             let kitCount = kitSearchIndex.length;
             let indicatorCount = indicatorSearchIndex.length;
+            let cfuSnapshotCount = 0;
+            try {
+                const cfuSnapshots = await getAllFromStore(STORE_CORRECTIONS);
+                cfuSnapshotCount = cfuSnapshots.length;
+            } catch (e) {
+                cfuSnapshotCount = correctionHistory.length;
+            }
             let totalBytes = 0;
             try {
                 const mediaItems = Array.from(mediaFullCache.values());
@@ -8485,6 +8749,7 @@
             const modalStain = document.getElementById("modalStainCount");
             const modalKit = document.getElementById("modalKitCount");
             const modalIndicator = document.getElementById("modalIndicatorCount");
+            const modalCFUSnapshots = document.getElementById("modalCFUSnapshotCount");
             const progressBar = document.getElementById("storageProgressBar");
 
             if (badge) badge.innerText = displaySize;
@@ -8494,6 +8759,7 @@
             if (modalStain) modalStain.innerText = stainCount;
             if (modalKit) modalKit.innerText = kitCount;
             if (modalIndicator) modalIndicator.innerText = indicatorCount;
+            if (modalCFUSnapshots) modalCFUSnapshots.innerText = cfuSnapshotCount;
 
             if (progressBar) {
                 const mbVal = parseFloat(megabytes);
@@ -8654,6 +8920,8 @@
         async function initDatabaseStorage() {
             try {
                 await openIDB();
+                await loadCorrectionHistory();
+                await loadStoredModel();
                 const storedMedia = await getAllFromStore(STORE_MEDIA);
                 const storedMicrobes = await getAllFromStore(STORE_MICROBES);
                 const storedStains = await getAllFromStore(STORE_STAINS);
@@ -9331,7 +9599,7 @@
             }, {passive: false});
 
             // Mouse down
-            canvas.addEventListener('mousedown', function (e) {
+            canvas.addEventListener('mousedown', async function (e) {
                 // Skip if touch was just used
                 if (cfuTouchActive) {
                     cfuTouchActive = false;
@@ -9420,6 +9688,7 @@
                             CapacitorPlugins.Haptics.impact({style: 'LIGHT'});
                         }
                         drawCFUCanvas();
+                        await saveCorrectionSnapshot();
                         break;
                     }
                 }
@@ -9446,6 +9715,7 @@
                         CapacitorPlugins.Haptics.impact({style: 'MEDIUM'});
                     }
                     drawCFUCanvas();
+                    await saveCorrectionSnapshot();
                 } else {
                     showToast('Click inside the petri dish mask to add a colony.', 'info');
                 }
@@ -10376,7 +10646,73 @@
                 });
         }
 
-    </script>
+            // Expose module variables globally
+        window.isCapacitor = isCapacitor;
+        window.CapacitorPlugins = CapacitorPlugins;
+        window.qrScannerInstance = qrScannerInstance;
+        window.qrScannedData = qrScannedData;
+        // Expose all variables and functions needed by other scripts
+window.mediaFullCache = mediaFullCache;
+window.microbeFullCache = microbeFullCache;
+window.stainFullCache = stainFullCache;
+window.kitFullCache = kitFullCache;
+window.indicatorFullCache = indicatorFullCache;
+window.selectMedia = selectMedia;
+window.selectStain = selectStain;
+window.selectKit = selectKit;
+window.selectIndicator = selectIndicator;
+window.applyFilters = applyFilters;
+window.applyMicrobeFilters = applyMicrobeFilters;
+window.applyStainFilters = applyStainFilters;
+window.applyKitFilters = applyKitFilters;
+window.applyIndicatorFilters = applyIndicatorFilters;
+window.showToast = showToast;
+window.showConfirmModal = showConfirmModal;
+window.persistMediaCatalog = persistMediaCatalog;
+window.persistMicrobeCatalog = persistMicrobeCatalog;
+window.persistStainCatalog = persistStainCatalog;
+window.persistKitCatalog = persistKitCatalog;
+window.persistIndicatorCatalog = persistIndicatorCatalog;
+window.getAllFromStore = getAllFromStore;
+window.getOneFromStore = getOneFromStore;
+window.putToStore = putToStore;
+window.saveBulkToStore = saveBulkToStore;
+window.clearStore = clearStore;
+window.dbInstance = dbInstance;
+window.STORE_MEDIA = STORE_MEDIA;
+window.STORE_MICROBES = STORE_MICROBES;
+window.STORE_STAINS = STORE_STAINS;
+window.STORE_KITS = STORE_KITS;
+window.STORE_INDICATORS = STORE_INDICATORS;
+window.currentSelectedMedia = currentSelectedMedia;
+window.currentSelectedStain = currentSelectedStain;
+window.currentSelectedKit = currentSelectedKit;
+window.currentSelectedIndicator = currentSelectedIndicator;
+window.batchItems = batchItems;
+window.mediaSearchIndex = mediaSearchIndex;
+window.microbeSearchIndex = microbeSearchIndex;
+window.stainSearchIndex = stainSearchIndex;
+window.kitSearchIndex = kitSearchIndex;
+window.indicatorSearchIndex = indicatorSearchIndex;
+window.lastFilteredMediaList = lastFilteredMediaList;
+window.lastFilteredMicrobeList = lastFilteredMicrobeList;
+window.lastFilteredStainList = lastFilteredStainList;
+window.lastFilteredKitList = lastFilteredKitList;
+window.lastFilteredIndicatorList = lastFilteredIndicatorList;
+window.openCustomMediaModal = openCustomMediaModal;
+window.closeCustomMediaModal = closeCustomMediaModal;
+window.renderBatchList = renderBatchList;
+window.toggleBatchDrawer = toggleBatchDrawer;
+window.escapeHTML = escapeHTML;
+window.parseIngredientString = parseIngredientString;
+window.isNoiseLine = isNoiseLine;
+window.sanitizeIngredientName = sanitizeIngredientName;
+window.debouncedApplyFilters = debouncedApplyFilters;
+window.debouncedApplyMicrobeFilters = debouncedApplyMicrobeFilters;
+window.debouncedApplyStainFilters = debouncedApplyStainFilters;
+window.debouncedApplyKitFilters = debouncedApplyKitFilters;
+window.debouncedApplyIndicatorFilters = debouncedApplyIndicatorFilters;
+window.triggerHapticFeedback = triggerHapticFeedback;</script>
     <footer class="border-t border-slate-800/50 bg-slate-950/80 py-3 px-4 no-print">
         <div
             class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-[9px] sm:text-[10px] text-slate-500">
