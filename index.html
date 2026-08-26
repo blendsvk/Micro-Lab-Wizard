@@ -11791,7 +11791,7 @@ window.triggerHapticFeedback = triggerHapticFeedback;</script>
             else start();
         })();
     </script>
-    <!-- ===== NIMO – FAKE SYSTEM NOTIFICATION ===== -->
+    <!-- ===== NIMO – NOTIFICATION BELOW HEADER ===== -->
 <script>
     (function() {
         'use strict';
@@ -11859,7 +11859,7 @@ window.triggerHapticFeedback = triggerHapticFeedback;</script>
             return pool[Math.floor(Math.random() * pool.length)];
         }
 
-        // ---- Navigation (same as before) ----
+        // ---- Navigation (unchanged) ----
         window.navigateToStudyItem = function(category, id, name) {
             var notif = document.getElementById('nimoSystemNotification');
             if (notif) notif.remove();
@@ -11926,7 +11926,7 @@ window.triggerHapticFeedback = triggerHapticFeedback;</script>
             }, 50);
         };
 
-        // ---- Create the fake system notification ----
+        // ---- Create the notification (positioned below header) ----
         function showSystemNotification() {
             if (document.getElementById('nimoSystemNotification')) return;
 
@@ -11980,10 +11980,16 @@ window.triggerHapticFeedback = triggerHapticFeedback;</script>
             var description = selected.intendedUse || selected.description || selected.principle || '';
             if (description.length > 100) description = description.substring(0, 100) + '…';
 
+            // ---- Get header height to position below it ----
+            var header = document.querySelector('header');
+            var headerHeight = header ? header.offsetHeight : 60; // fallback
+
             // Build the notification element
             var notif = document.createElement('div');
             notif.id = 'nimoSystemNotification';
-            notif.className = 'fixed top-0 left-0 right-0 z-[200] p-3 pointer-events-none transition-all duration-500 transform -translate-y-full';
+            notif.className = 'fixed left-0 right-0 z-[200] p-3 pointer-events-none transition-all duration-500 transform -translate-y-full';
+            // Set top position to header height
+            notif.style.top = headerHeight + 'px';
             notif.style.background = 'linear-gradient(180deg, rgba(15,23,42,0.98) 0%, rgba(3,7,18,0.98) 100%)';
             notif.style.borderBottom = '1px solid rgba(6,182,212,0.2)';
             notif.style.boxShadow = '0 4px 30px rgba(0,0,0,0.8)';
