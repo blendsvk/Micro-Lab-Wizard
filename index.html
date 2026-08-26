@@ -11791,7 +11791,7 @@ window.triggerHapticFeedback = triggerHapticFeedback;</script>
             else start();
         })();
     </script>
-    <!-- ===== STUDY RECOMMENDATION POPUP – APK‑FRIENDLY ===== -->
+    <!-- ===== STUDY RECOMMENDATION POPUP – APK BULLETPROOF ===== -->
 <script>
     (function() {
         'use strict';
@@ -11799,21 +11799,17 @@ window.triggerHapticFeedback = triggerHapticFeedback;</script>
         // ---- Helper: escape HTML ----
         function escapeHTML(str) {
             if (!str) return '';
-            const d = document.createElement('div');
+            var d = document.createElement('div');
             d.textContent = str;
             return d.innerHTML;
         }
 
         // ================================================================
-        //  📌 PASTE YOUR 10 SVG CODES HERE (between the backticks)
-        //  REPLACE the placeholder SVGs with your actual ones.
+        //  📌 PASTE YOUR 10 SVG CODES HERE (keep your existing array)
         // ================================================================
-        const userSVGs = [
-            // SVG 1 – REPLACE ME
-            `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="#10DDE5"/></svg>`,
-            // SVG 2 – REPLACE ME
-            `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="20" width="60" height="60" fill="#10DDE5"/></svg>`,
-            // ... add your other 8 SVGs here
+        var userSVGs = [
+            // SVG 1 ... up to SVG 10 (your actual ones)
+            // (I'm not repeating them – use your own array)
         ];
 
         function getRandomAvatarSVG() {
@@ -11821,7 +11817,7 @@ window.triggerHapticFeedback = triggerHapticFeedback;</script>
         }
 
         // ---- Engaging prompts ----
-        const prompts = {
+        var prompts = {
             Media: [
                 "🧪 Ready to explore this culture medium?",
                 "📊 Let's examine the formulation of this growth medium!",
@@ -11860,25 +11856,25 @@ window.triggerHapticFeedback = triggerHapticFeedback;</script>
         };
 
         function getRandomPrompt(category) {
-            const pool = prompts[category] || prompts.generic;
+            var pool = prompts[category] || prompts.generic;
             return pool[Math.floor(Math.random() * pool.length)];
         }
 
         // ---- Navigation function (global) ----
         window.navigateToStudyItem = function(category, id, name) {
-            const modal = document.getElementById('studyRecommendationModal');
+            var modal = document.getElementById('studyRecommendationModal');
             if (modal) modal.remove();
 
             setTimeout(function() {
                 if (category === 'Media') {
                     if (typeof switchAppView === 'function') switchAppView('media');
-                    const searchInput = document.getElementById('searchInput');
+                    var searchInput = document.getElementById('searchInput');
                     if (searchInput) searchInput.value = '';
                     if (typeof applyFilters === 'function') applyFilters();
 
-                    let targetId = id;
-                    if (!window.mediaFullCache?.has(id)) {
-                        const found = window.mediaSearchIndex?.find(item => item.name === name);
+                    var targetId = id;
+                    if (!window.mediaFullCache || !window.mediaFullCache.has(id)) {
+                        var found = (window.mediaSearchIndex || []).find(function(item) { return item.name === name; });
                         if (found) targetId = found.id;
                     }
                     setTimeout(function() {
@@ -11888,12 +11884,12 @@ window.triggerHapticFeedback = triggerHapticFeedback;</script>
                 } else {
                     if (typeof switchAppView === 'function') switchAppView('staining');
 
-                    let tab = 'solutions';
-                    let searchInputId = 'stainSearchInput';
-                    let filterFunc = 'applyStainFilters';
-                    let selectFunc = 'selectStain';
-                    let cacheMap = window.stainFullCache;
-                    let searchIndex = window.stainSearchIndex;
+                    var tab = 'solutions';
+                    var searchInputId = 'stainSearchInput';
+                    var filterFunc = 'applyStainFilters';
+                    var selectFunc = 'selectStain';
+                    var cacheMap = window.stainFullCache;
+                    var searchIndex = window.stainSearchIndex;
 
                     if (category === 'Kit') {
                         tab = 'kits';
@@ -11913,13 +11909,13 @@ window.triggerHapticFeedback = triggerHapticFeedback;</script>
 
                     if (typeof switchStainTab === 'function') switchStainTab(tab);
 
-                    const searchInput = document.getElementById(searchInputId);
+                    var searchInput = document.getElementById(searchInputId);
                     if (searchInput) searchInput.value = '';
                     if (typeof window[filterFunc] === 'function') window[filterFunc]();
 
-                    let targetId = id;
-                    if (!cacheMap?.has(id)) {
-                        const found = searchIndex?.find(item => item.name === name);
+                    var targetId = id;
+                    if (!cacheMap || !cacheMap.has(id)) {
+                        var found = (searchIndex || []).find(function(item) { return item.name === name; });
                         if (found) targetId = found.id;
                     }
 
@@ -11931,14 +11927,32 @@ window.triggerHapticFeedback = triggerHapticFeedback;</script>
             }, 50);
         };
 
-        // ---- Show the modal ----
+        // ---- Build and show the modal ----
         function showRecommendationIfNeeded(forcedCategory) {
             if (document.getElementById('studyRecommendationModal')) return;
 
-            var mediaList = Array.from(window.mediaFullCache?.values?.() || []);
-            var stainList = Array.from(window.stainFullCache?.values?.() || []);
-            var kitList   = Array.from(window.kitFullCache?.values?.() || []);
-            var indicatorList = Array.from(window.indicatorFullCache?.values?.() || []);
+            // Gather items from caches (if available)
+            var mediaList = [];
+            var stainList = [];
+            var kitList = [];
+            var indicatorList = [];
+
+            try {
+                if (window.mediaFullCache && typeof window.mediaFullCache.values === 'function') {
+                    mediaList = Array.from(window.mediaFullCache.values());
+                }
+                if (window.stainFullCache && typeof window.stainFullCache.values === 'function') {
+                    stainList = Array.from(window.stainFullCache.values());
+                }
+                if (window.kitFullCache && typeof window.kitFullCache.values === 'function') {
+                    kitList = Array.from(window.kitFullCache.values());
+                }
+                if (window.indicatorFullCache && typeof window.indicatorFullCache.values === 'function') {
+                    indicatorList = Array.from(window.indicatorFullCache.values());
+                }
+            } catch (e) {
+                // Ignore errors – fallback to empty lists
+            }
 
             var allItems = []
                 .concat(mediaList.map(function(item) { return { ...item, category: 'Media' }; }))
@@ -11950,6 +11964,7 @@ window.triggerHapticFeedback = triggerHapticFeedback;</script>
                 allItems = allItems.filter(function(item) { return item.category === forcedCategory; });
             }
 
+            // Fallback if no data
             if (allItems.length === 0) {
                 allItems = [{
                     category: 'Media',
@@ -11985,7 +12000,7 @@ window.triggerHapticFeedback = triggerHapticFeedback;</script>
             var description = selected.intendedUse || selected.description || selected.principle || '';
             if (description.length > 210) description = description.substring(0, 210) + '…';
 
-            // Modal HTML
+            // Build modal HTML
             var modal = document.createElement('div');
             modal.id = 'studyRecommendationModal';
             modal.className = 'fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[100] flex items-center justify-center p-4 sm:p-6';
@@ -12065,6 +12080,7 @@ window.triggerHapticFeedback = triggerHapticFeedback;</script>
                 lucide.createIcons();
             }
 
+            // ---- Event listeners ----
             var closeBtns = modal.querySelectorAll('.close-btn');
             var studyBtn = modal.querySelector('.study-btn');
 
@@ -12081,37 +12097,41 @@ window.triggerHapticFeedback = triggerHapticFeedback;</script>
 
         window.showNimoModal = showRecommendationIfNeeded;
 
-        // ---- APK‑friendly app‑ready detection ----
+        // ================================================================
+        //  BULLETPROOF TRIGGER – works even in slow WebViews
+        // ================================================================
         function tryShow() {
-            var appReady = function() {
-                return (typeof window.switchAppView === 'function' &&
-                        typeof window.selectMedia === 'function' &&
-                        (window.mediaFullCache?.size > 0 ||
-                         window.stainFullCache?.size > 0 ||
-                         window.kitFullCache?.size > 0 ||
-                         window.indicatorFullCache?.size > 0));
-            };
+            // 1. Wait for the main app to be ready (switchAppView defined)
+            var startTime = Date.now();
+            var maxWait = 10000; // 10 seconds
 
-            if (appReady()) {
-                requestAnimationFrame(function() {
-                    setTimeout(showRecommendationIfNeeded, 800);
-                });
-                return;
+            function checkAndShow() {
+                var appReady = (typeof window.switchAppView === 'function' &&
+                                typeof window.selectMedia === 'function');
+
+                if (appReady || (Date.now() - startTime > maxWait)) {
+                    // Show modal after a small delay to let the DOM settle
+                    setTimeout(function() {
+                        showRecommendationIfNeeded();
+                    }, 400);
+                    return;
+                }
+                // Check again in 200ms
+                setTimeout(checkAndShow, 200);
             }
 
-            var attempts = 0;
-            var maxAttempts = 50;
-            var interval = setInterval(function() {
-                attempts++;
-                if (appReady() || attempts >= maxAttempts) {
-                    clearInterval(interval);
-                    requestAnimationFrame(function() {
-                        setTimeout(showRecommendationIfNeeded, 800);
-                    });
+            // Start checking
+            checkAndShow();
+
+            // 2. Safety timer: if nothing happened after 12 seconds, force it.
+            setTimeout(function() {
+                if (!document.getElementById('studyRecommendationModal')) {
+                    showRecommendationIfNeeded();
                 }
-            }, 200);
+            }, 12000);
         }
 
+        // ---- Run when DOM is ready ----
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', tryShow);
         } else {
